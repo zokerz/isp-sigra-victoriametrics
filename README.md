@@ -54,6 +54,26 @@ MIKROTIK_PASSWORD=strong-password
 
 Edit `configs/config.example.yaml` and add routers. Sensitive username/password values can stay as placeholders when the environment variables above are set.
 
+For more than one monitored router, add more items under `routers`. The collector polls each router in its own background loop and exposes all series with a `router` label. The Grafana dashboard includes a multi-select Router filter.
+
+```yaml
+routers:
+  - name: "pop-jakarta-01"
+    address: "10.10.2.110"
+    api_port: 8728
+    username: "monitor"
+    password: "change-this"
+    use_tls: false
+  - name: "pop-bandung-01"
+    address: "10.20.2.110"
+    api_port: 8729
+    username: "monitor"
+    password: "change-this"
+    use_tls: true
+```
+
+`MIKROTIK_USERNAME` and `MIKROTIK_PASSWORD` override YAML credentials for all routers. Leave them unset if each router needs different credentials.
+
 ## Run
 
 ```bash
@@ -64,9 +84,10 @@ Services:
 
 - Collector: http://localhost:9107
 - VictoriaMetrics: http://localhost:8428
-- Grafana: http://localhost:3000
+- Grafana: http://localhost:3300
 
 Grafana default credentials come from `.env`; defaults are `admin/admin`.
+The compose file enables iframe embedding for the main ISP app. Keep Grafana behind a trusted network or reverse proxy before enabling public access.
 
 ## Validate
 
