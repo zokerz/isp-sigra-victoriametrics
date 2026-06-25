@@ -1,0 +1,162 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "fieldConfig": {"defaults": {"mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "id": 1,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "min(mikrotik_router_api_up{router=~\"$router\"})", "refId": "A"}],
+      "title": "Router API Status",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+      "id": 2,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "sum(mikrotik_interface_up{router=~\"$router\"})", "refId": "A"}],
+      "title": "PPPoE Interfaces Up",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "fieldConfig": {"defaults": {"unit": "bps"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+      "id": 3,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "sum(rate(mikrotik_interface_rx_bytes_total{router=~\"$router\"}[5m])) * 8", "refId": "A"}],
+      "title": "Total Download",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "fieldConfig": {"defaults": {"unit": "bps"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "id": 4,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto"},
+      "targets": [{"expr": "sum(rate(mikrotik_interface_tx_bytes_total{router=~\"$router\"}[5m])) * 8", "refId": "A"}],
+      "title": "Total Upload",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "fieldConfig": {"defaults": {"unit": "bps"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+      "id": 5,
+      "targets": [{"expr": "topk(10, rate(mikrotik_interface_rx_bytes_total{router=~\"$router\"}[5m]) * 8)", "legendFormat": "{{interface}}", "refId": "A"}],
+      "title": "Top 10 Download",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "fieldConfig": {"defaults": {"unit": "bps"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+      "id": 6,
+      "targets": [{"expr": "topk(10, rate(mikrotik_interface_tx_bytes_total{router=~\"$router\"}[5m]) * 8)", "legendFormat": "{{interface}}", "refId": "A"}],
+      "title": "Top 10 Upload",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "fieldConfig": {"defaults": {"unit": "bps"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 16, "x": 0, "y": 12},
+      "id": 7,
+      "targets": [
+        {"expr": "rate(mikrotik_interface_rx_bytes_total{router=~\"$router\",interface=~\"$interface\"}[5m]) * 8", "legendFormat": "{{interface}} download", "refId": "A"},
+        {"expr": "rate(mikrotik_interface_tx_bytes_total{router=~\"$router\",interface=~\"$interface\"}[5m]) * 8", "legendFormat": "{{interface}} upload", "refId": "B"}
+      ],
+      "title": "Per Customer Traffic",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 12},
+      "id": 8,
+      "targets": [{"expr": "mikrotik_interface_up{router=~\"$router\",interface=~\"$interface\"}", "format": "table", "instant": true, "refId": "A"}],
+      "title": "Interface Status Table",
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "gridPos": {"h": 7, "w": 12, "x": 0, "y": 20},
+      "id": 9,
+      "targets": [{"expr": "mikrotik_router_api_duration_seconds{router=~\"$router\"}", "legendFormat": "{{router}}", "refId": "A"}],
+      "title": "API Poll Duration",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "gridPos": {"h": 7, "w": 12, "x": 12, "y": 20},
+      "id": 10,
+      "targets": [{"expr": "mikrotik_router_api_up{router=~\"$router\"} == 0", "legendFormat": "{{router}} API down", "refId": "A"}],
+      "title": "Failed API Status",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["mikrotik", "pppoe", "victoriametrics"],
+  "templating": {
+    "list": [
+      {
+        "current": {"selected": false, "text": "All", "value": "$__all"},
+        "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+        "definition": "label_values(mikrotik_interface_rx_bytes_total, router)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Router",
+        "multi": true,
+        "name": "router",
+        "options": [],
+        "query": {"query": "label_values(mikrotik_interface_rx_bytes_total, router)", "refId": "StandardVariableQuery"},
+        "refresh": 1,
+        "type": "query"
+      },
+      {
+        "current": {"selected": false, "text": "All", "value": "$__all"},
+        "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+        "definition": "label_values(mikrotik_interface_rx_bytes_total{router=~\"$router\"}, interface)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Interface",
+        "multi": true,
+        "name": "interface",
+        "options": [],
+        "query": {"query": "label_values(mikrotik_interface_rx_bytes_total{router=~\"$router\"}, interface)", "refId": "StandardVariableQuery"},
+        "refresh": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {"from": "now-6h", "to": "now"},
+  "timezone": "browser",
+  "title": "MikroTik PPPoE Overview",
+  "uid": "mikrotik-pppoe-overview",
+  "version": 1,
+  "weekStart": ""
+}

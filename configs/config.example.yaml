@@ -1,0 +1,26 @@
+server:
+  listen_addr: "0.0.0.0:9107"
+
+polling:
+  interval_seconds: 60
+  timeout_seconds: 15
+
+routers:
+  - name: "core-pppoe-01"
+    address: "10.10.2.110"
+    api_port: 8728
+    username: "monitor"
+    password: "change-this"
+    use_tls: false
+
+filter:
+  include_prefixes:
+    - "pppoe-"
+    - "<pppoe-"
+  exclude_prefixes:
+    - "ovpn-"
+    - "sstp-"
+    - "l2tp-"
+
+metrics:
+  mode: "prometheus"

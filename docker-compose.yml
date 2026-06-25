@@ -1,0 +1,79 @@
+services:
+  collector:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: mikrotik-api-collector
+    env_file:
+      - path: .env
+        required: false
+    ports:
+      - "9107:9107"
+    volumes:
+      - ./configs/config.example.yaml:/etc/mikrotik-collector/config.yaml:ro
+    command: ["--config", "/etc/mikrotik-collector/config.yaml"]
+    restart: unless-stopped
+    networks:
+      - monitoring-net
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9107/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  vmagent:
+    image: victoriametrics/vmagent:latest
+    container_name: mikrotik-vmagent
+    command:
+      - "-promscrape.config=/etc/vmagent/prometheus.yml"
+      - "-remoteWrite.url=http://victoriametrics:8428/api/v1/write"
+    volumes:
+      - ./configs/prometheus.yml:/etc/vmagent/prometheus.yml:ro
+    depends_on:
+      - victoriametrics
+      - collector
+    restart: unless-stopped
+    networks:
+      - monitoring-net
+
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:latest
+    container_name: mikrotik-victoriametrics
+    command:
+      - "-retentionPeriod=1y"
+      - "-storageDataPath=/storage"
+      - "-httpListenAddr=:8428"
+    volumes:
+      - victoriametrics-data:/storage
+    ports:
+      - "8428:8428"
+    restart: unless-stopped
+    networks:
+      - monitoring-net
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: mikrotik-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - victoriametrics
+    restart: unless-stopped
+    networks:
+      - monitoring-net
+
+volumes:
+  victoriametrics-data:
+  grafana-data:
+
+networks:
+  monitoring-net:
+    driver: bridge

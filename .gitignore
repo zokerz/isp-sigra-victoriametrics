@@ -1,0 +1,16 @@
+.env
+*.log
+
+# Go build/test output
+/bin/
+/dist/
+coverage.out
+
+# Local editor/system files
+.DS_Store
+.idea/
+.vscode/
+
+# Runtime data should live in Docker volumes, not git
+grafana-data/
+victoriametrics-data/
